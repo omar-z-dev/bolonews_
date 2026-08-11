@@ -1,4 +1,5 @@
 <?php
+//Rôle : Contrôleur chargé de la gestion des articles.
 
 namespace App\Controller;
 
