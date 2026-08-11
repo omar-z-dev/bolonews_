@@ -1,0 +1,325 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Bolonews - Accueil
+{% endblock %}
+
+{% block body %}
+
+    <header class="site-header">
+        <nav class="navbar container">
+
+            <div class="logo">
+                <a href="{{ path('app_admin') }}">Mon Profil Admin</a>
+            </div>
+
+            <ul class="menu">
+                <li><a href="{{ path('app_home') }}">Home</a></li>
+                <li><a href="{{ path('article_liste') }}">Articles</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+
+            <div class="connexion">
+
+                {% if app.user %}
+                
+                    <span>Bonjour {{ app.user.pseudo }}</span>
+                    <a class="gr" href="{{ path('app_logout') }}">
+                        Se déconnecter
+                    </a>
+                {% else %}
+                    <a class="gr" href="{{ path('app_login') }}">
+                        Se connecter
+                    </a>
+                    <a class="gr" href="{{ path('app_register') }}">
+                        M’inscrire
+                    </a>
+                {% endif %}
+
+            </div>
+        </nav>
+    </header>
+
+
+    <div class="container">
+        <div class="banniere">
+            <main>
+                <section class="hero">
+                    <h1>Mon Profil Admin</h1>
+                    <h3>
+                    Les meilleures sauces pour les pâtes et de l'actualité sur le grill
+                    </h3>
+                </section>
+
+                <div class="container-list-users">
+
+                <h2>Liste des utilisateurs</h2>
+
+                <!-- table des utilisateurs -->
+                
+                <table class="table-list-users">
+                    <thead>
+                        <tr>
+                            <th>Pseudo</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for utilisateur in utilisateurs %}
+                            <tr>
+                                <td>{{ utilisateur.pseudo }}</td>
+                                <td>{{ utilisateur.email }}</td>
+
+                                <td>
+                                    {# BANNIR / DÉBANNIR #}
+                                    <form
+                                        method="post"
+                                        action="{{ path('admin_user_bannir', {id: utilisateur.id}) }}"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('bannir-user-' ~ utilisateur.id) }}"
+                                        >
+
+                                        <button type="submit" class="btn-bannir">
+
+                                            {% if utilisateur.banned %}
+                                                Débannir
+                                            {% else %}
+                                                Bannir
+                                            {% endif %}
+
+                                        </button>
+                                    </form>
+                                    {# SUPPRIMER USER #}
+                                    <form
+                                        method="post"
+                                        action="{{ path('admin_user_supprimer', {id: utilisateur.id}) }}"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('delete-user-' ~ utilisateur.id) }}"
+                                        >
+
+                                        <button type="submit" class="btn-supprimer">
+                                            Supprimer
+                                        </button>
+
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+                <!-- btn ajoute un article -->
+
+                <a href="{{ path('article_ajouter') }}" class="btn-ajouter">
+                    Ajouter un article →
+                </a>
+
+                <!-- section Mes articles Publiés -->
+                
+                <section class="mes-parutions">
+
+                    <h2>Mes articles Publiés</h2>
+                    <div class="liste-articles">
+                        {% for article in articlesPublies %}
+                            <article class="card">
+                                <!-- image de l'article -->
+                                <div class="image">
+                                    <img src="{{ asset('uploads/articles/' ~ article.image) }}" alt="{{ article.titre }}">
+                                </div>
+
+                                <div class="contenu">
+
+
+
+                                    <div class="infos">
+                                        <!-- categorie de l'article -->
+                                        <span class="categorie">
+                                            {{ article.categorie.libelle }}
+                                        </span>
+
+                                        <!-- btn éditer -->
+                                        <a href="{{ path('article_modifier', {id: article.id}) }}" class="editer">
+                                            Éditer
+                                        </a>
+
+                                        <!-- btn supprimer -->
+                                        <form method="post"
+                                            action="{{ path('article_supprimer', {id: article.id}) }}"
+                                            onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+
+                                            <input
+                                                type="hidden"
+                                                name="_token"
+                                                value="{{ csrf_token('supprimer' ~ article.id) }}"
+                                            >
+                                            <button type="submit" class="btn-supprimer">
+                                                Supprimer
+                                            </button>
+                                        </form>
+                                        <!-- btn depublier -->
+                                        <form method="post" action="{{ path ('article_depublier', {id: article.id}) }}">
+
+                                            <input
+                                                type="hidden"
+                                                name="_token"
+                                                value="{{ csrf_token('depublier' ~ article.id) }}"
+                                            >
+
+                                            <button type="submit" class="btn-depublier">
+                                                Dépublier
+                                            </button>
+
+                                        </form>
+                                        
+                                    </div>
+                                    <div>
+                                        <!-- titre de l'article -->
+                                        <h3>
+                                            {{ article.titre }}
+                                        </h3>
+                                        <!-- auteur de l'article -->
+                                        <p class="auteur">
+                                            {{ article.auteur.pseudo }}
+                                        </p>
+                                    </div>
+                                    <!-- date de creation de l'article -->
+                                    <small class="date-creation">
+                                        le {{ article.dateCreation|date('d-m-Y à H:i') }}
+                                    </small>
+
+                                    <!-- contenu de l'article -->
+                                    {% set extrait = article.contenu|slice(0, 250) %}
+
+                                    <p>
+                                        {{ extrait|split(' ')|slice(0, -1)|join(' ') }}...
+                                    </p>
+                                        
+                                    <!-- btn lire la suite -->
+                                    <div class="btn-lire-la-suite">
+                                        <a href="{{ path('article_afficher', {id: article.id}) }}">
+                                            Lire la suite →
+                                        </a>
+                                    </div>
+
+                                    <!-- stats de l'article : commentaires et likes -->
+                                    <div class="stats">
+                                        <span class="commentaires-likes"><img src="{{ asset('images/message-circle.png') }}" alt="Commentaires"> {{ article.commentaires|length }}</span>
+
+                                        <span class="commentaires-likes"><img src="{{ asset('images/heart.png') }}" alt="Likes">{{ article.articleLikes|length }}</span>
+                                    </div>
+
+                                    
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- section Mes articles Non Publiés -->
+
+                <section class="mes-parutions-non-publies">
+
+                    <h2>Mes articles Non Publiés</h2>
+                    <div class="liste-articles">
+                        {% for article in articlesNonPublies %}
+                            <article class="card">
+                                <!-- image de l'article -->
+                                <div class="image">
+                                    <img src="{{ asset('uploads/articles/' ~ article.image) }}" alt="{{ article.titre }}">
+                                </div>
+
+                                <div class="contenu">
+                                    <div class="infos">
+                                        <!-- categorie de l'article -->
+                                        <span class="categorie">
+                                            {{ article.categorie.libelle }}
+                                        </span>
+
+                                        <!-- btn éditer -->
+                                        <a href="{{ path('article_modifier', {id: article.id}) }}" class="editer">
+                                            Éditer
+                                        </a>
+                                    </div>
+                                    <!-- titre de l'article -->
+                                    <h3>
+                                        {{ article.titre }}
+                                    </h3>
+                                    <!-- auteur de l'article -->
+                                    <p class="auteur">
+                                        {{ article.auteur.pseudo }}
+                                    </p>
+                                    <!-- date de creation de l'article -->
+                                    <small class="date-creation">
+                                        le {{ article.dateCreation|date('d-m-Y à H:i') }}
+                                    </small>
+
+                                    <!-- contenu de l'article -->
+                                    {% set extrait = article.contenu|slice(0, 250) %}
+
+                                    <p>
+                                        {{ extrait|split(' ')|slice(0, -1)|join(' ') }}...
+                                    </p>
+
+                                    <!-- btn lire la suite -->
+                                    <div class="btn-lire-la-suite">
+                                        <a href="{{ path('article_afficher', {id: article.id}) }}">
+                                            Lire la suite →
+                                        </a>
+                                    </div>
+
+                                    <!-- btn publier -->
+                                    <form method="post" action="{{ path ('article_publier', {id: article.id}) }}">
+
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('publier' ~ article.id) }}"
+                                        >
+
+                                        <button type="submit" class="btn-publier">
+                                            Publier
+                                        </button>
+
+                                    </form>
+                                    
+                                    <!-- stats de l'article : commentaires et likes -->
+                                    <div class="stats">
+                                        <span class="commentaires-likes"><img src="{{ asset('images/message-circle.png') }}" alt="Commentaires"> {{ article.commentaires|length }}</span>
+
+                                        <span class="commentaires-likes"><img src="{{ asset('images/heart.png') }}" alt="Likes">{{ article.articleLikes|length }}</span>
+                                    </div>
+                                    <!-- btn supprimer -->
+                                    <form method="post"
+                                        action="{{ path('article_supprimer', {id: article.id}) }}"
+                                        onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+                                        <!--ajouter une protection -->
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="{{ csrf_token('supprimer' ~ article.id) }}"
+                                        >
+
+                                        <button type="submit"   class="btn-supprimer">
+                                            Supprimer
+                                        </button>
+                                    </form>
+                            
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+{% endblock %}

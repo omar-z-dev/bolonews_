@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ article.titre }}
+{% endblock %}
+
+{% block body %}
+
+<div class="container-article">
+
+    <p class="categorie">
+         {{ article.categorie.libelle }}
+    </p>
+    {# message vs avez deja commenté #}
+        {% for message in app.flashes('danger') %}
+            <div class="alert-danger">
+                <span>{{ message }}</span>
+
+                <button type="button" class="fermer-alert" onclick="this.parentElement.remove()">
+                    ×
+                </button>
+            </div>
+        {% endfor %}
+
+    <h1>{{ article.titre }}</h1>
+
+    <p class="date-creation">
+        Publié le {{ article.dateCreation|date('d/m/Y à H:i') }}
+    </p>
+
+    <p class="auteur">
+        Auteur : {{ article.auteur.pseudo }}
+    </p>
+
+    {% if article.image %}
+        <img src="{{ asset('uploads/articles/' ~ article.image) }}" alt="{{ article.titre }}">
+    {% endif %}
+
+    <p class="contenu-affichage">{{ article.contenu }}</p>
+
+    <!-- stats de l'article : commentaires et likes -->
+    <div class="stats">
+        <span class="commentaires-likes">
+            <img src="{{ asset('images/message-circle.png') }}" alt="Commentaires">
+            {{ article.commentaires|length }}
+        </span>
+
+        <div class="commentaires-likes">
+            <button type="button" class="btn-like" data-id="{{ article.id }}">
+                <svg class ="coeur" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M241 87.1l15 20.7 15-20.7C296 52.5 336.2 32 378.9 32 452.4 32 512 91.6 512 165.1l0 2.6c0 112.2-139.9 242.5-212.9 298.2-12.4 9.4-27.6 14.1-43.1 14.1s-30.8-4.6-43.1-14.1C139.9 410.2 0 279.9 0 167.7l0-2.6C0 91.6 59.6 32 133.1 32 175.8 32 216 52.5 241 87.1z"/></svg>
+            </button>
+
+            <span class="likes">
+                {{ article.articleLikes|length }}
+            </span>
+        </div>
+    </div>
+
+    {######### liste des  commentaire  #########}
+
+    <div class="liste-commentaires">
+
+        <h3 class="commentaires-titre">Commentaires :</h3>
+
+        {% if article.commentaires is not empty %}
+
+            {% for commentaire in article.commentaires %}
+
+                <div class="commentaire">
+                    <div class="commentaire-detail">
+                        <div class="auteur-commentaire">
+                            {# chemin image amodifier pour l'avatar.. #}
+                            <img
+                                class="avatar-commentaire"
+                                src="{{ asset('images/isabelle.jpg') }}"
+                                alt="Avatar"
+                            >
+
+                            <strong>
+                                {{ commentaire.auteur.pseudo }}
+                            </strong>
+                        </div>
+
+                        <p class="date-commentaire">
+                            Posté le : {{ commentaire.datePublication|date('d/m/Y à H\\hi') }}
+                        </p>
+                    </div>
+                    
+
+                    <p>{{ commentaire.contenu }} </p>
+                
+                    
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>Aucun commentaire pour le moment.</p>
+
+        {% endif %}
+
+    </div>
+
+    {######### Ajouter un commentaire  #########}
+
+    <div class="container-commentaire">
+
+    <h3>Ajouter un commentaire</h3>
+
+        {% if app.user %}
+
+            {{ form_start(formCommentaire) }}
+
+                {{ form_row(formCommentaire.contenu) }}
+
+                <button type="submit" class="btn-commentaire">
+                    Ajouter
+                </button>
+
+            {{ form_end(formCommentaire) }}
+
+        {% else %}
+
+            <p>Vous devez <a href="{{ path('app_login') }}">vous <span class="connecter">connecter</span></a> pour ajouter un commentaire.</p>
+
+        {% endif %}
+
+    </div>
+
+    {# btn retour #}
+    <a class="btn-retour"
+    href="{{ app.request.headers.get('referer') ?: path('app_home') }}">
+        Retour
+    </a>
+</div>
+
+{% endblock %}

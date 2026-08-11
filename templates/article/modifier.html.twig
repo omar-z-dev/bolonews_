@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+
+
+    {% block title %}
+        Modifier {{ article.titre }}
+    {% endblock %}
+
+    {% block body %}
+
+    <div class="form-ajouter">
+
+        <h1>Modifier {{ article.titre }}</h1>
+
+        {% if article.image %}
+            <img
+                src="{{ asset('uploads/articles/' ~ article.image) }}"
+                alt="{{ article.titre }}"
+                width="250"
+            >
+        {% endif %}
+
+        {{ form_start(form) }}
+
+            {{ form_widget(form) }}
+
+            <button type="submit" class="btn-editer">
+                Enregistrer les modifications
+            </button>
+
+
+            <div>
+                <a class="btn-retour" href="{{ path('app_dashboard') }}">
+                    Retour
+                </a>
+            </div>
+
+        {{ form_end(form) }}
+
+</div>
+
+{% endblock %}

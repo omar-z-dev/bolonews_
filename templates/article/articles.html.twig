@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Bolonews - Accueil
+{% endblock %}
+
+{% block body %}
+
+    <header class="site-header">
+        <nav class="navbar container">
+
+            <div class="logo">
+                <a href="{{ path('app_home') }}">Articles</a>
+            </div>
+
+            <ul class="menu">
+
+                <li>
+                    <a
+                        href="{{ path('app_home') }}"
+                        class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}"
+                    >
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="{{ path('article_liste') }}"
+                        class="{{ app.request.attributes.get('_route') == 'article_liste' ? 'active' : '' }}"
+                    >
+                        Articles
+                    </a>
+                </li>
+
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <div class="connexion">
+                {% if app.user %}
+                    <span>Bonjour {{ app.user.pseudo }}</span>
+
+                    {# afficher la route en fonction de user ou admin #}
+                    {% if is_granted('ROLE_ADMIN') %}
+
+                        <a href="{{ path('app_admin') }}" class="profil gr">
+                            Profil
+                            <img
+                                src="{{ asset('images/isabelle.jpg') }}"
+                                alt="Profil"
+                            >
+                        </a>
+
+                    {% else %}
+
+                        <a href="{{ path('app_dashboard') }}" class="profil gr">
+                            Profil
+                            <img
+                                src="{{ asset('images/isabelle.jpg') }}"
+                                alt="Profil"
+                            >
+                        </a>
+
+                    {% endif %}
+
+                    {# btn Se déconnecter #}
+                    <a class="gr" href="{{ path('app_logout') }}">
+                        Se déconnecter
+                    </a>
+                {% else %}
+                    {# btn Se connecter #}
+                    <a class="gr" href="{{ path('app_login') }}">
+                        Se connecter
+                    </a>
+                    {# btn M’inscrire #}
+                    <a class="gr" href="{{ path('app_register') }}">
+                        M’inscrire
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+    <main>
+        <!-- section HERO -->
+        <!-- section HERO -->
+        
+        <section class="hero">
+            <h1>Bolonews</h1>
+            <h3>
+                Les meilleures sauces pour les pâtes et de l'actualité sur le grill
+            </h3>
+        </section>
+        
+        <!-- btn recherche -->
+        <!-- btn recherche -->
+        <form class="recherche" action="{{ path('article_liste') }}" method="get">
+            <input
+                type="text"
+                id="search"
+                name="search"
+                value="{{ recherche ?? '' }}"
+                placeholder="Rechercher un article...">
+                
+                <button type="button" class="btn-effacer" onclick="effacerRecherche()">
+                    ×
+                </button>
+
+            <button class="btn-recherche" type="submit">
+                <img
+                    src="{{ asset('images/icons/search.svg') }}"
+                    alt="Rechercher"
+                    class="icone-recherche"
+                >
+            </button>
+        </form>
+
+        <!-- listes des catégorie disponibles -->
+        <div class="categories-list">
+
+            <a class="cat-single" href="{{ path('article_liste') }}">
+                Toutes
+            </a>
+
+            {% for categorie in categories %}
+
+                <a class="cat-single" href="{{ path('article_liste', {
+                    categorie: categorie.id
+                }) }}">
+                    {{ categorie.libelle }}
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- Résultats de recherche -->
+        <!-- Résultats de recherche -->
+        <section class="dernieres-parutions">
+
+            <h2>Résultats de recherche</h2>
+            <div class="liste-articles">
+
+                {% for article in articles %}
+                    <article class="card">
+                        <div class="image">
+                            <img
+                                src="{{ asset('uploads/articles/' ~ article.image) }}"
+                                alt="{{ article.titre }}"
+                            >
+                        </div>
+                        
+                        <div class="contenu">
+                            <span class="categorie">
+                                {{ article.categorie.libelle }}
+                            </span>
+                            <h3>
+                                {{ article.titre }}
+                            </h3>
+                            <p class="auteur">
+                                {% if article.auteur %}
+                                    {{ article.auteur.pseudo }}
+                                {% else %}
+                                    Utilisateur supprimé
+                                {% endif %}
+                            </p>
+                            <small>
+                                le {{ article.dateCreation|date('d-m-Y à H:i') }}
+                            </small>
+                            <!-- contenu de l'article -->
+                            {% set extrait = article.contenu|slice(0, 250) %}
+
+                            <p>
+                                {{ extrait|split(' ')|slice(0, -1)|join(' ') }}...
+                            </p>
+                            <!-- btn lire la suite -->
+                            <div class="btn-lire-la-suite">
+                                <a href="{{ path('article_afficher', {id: article.id}) }}">
+                                    Lire la suite <img
+                                src="{{ asset('images/icons/arrow-right.svg') }}"
+                                alt=""
+                                class="fleche-lire-suite"
+                            >
+                                </a>
+                            </div>
+                            <!-- stats de l'article : commentaires et likes -->
+                            <div class="stats">
+                                <span class="commentaires-likes"><img src="{{ asset('images/message-circle.png') }}" alt="Commentaires">{{ article.commentaires|length }}</span>
+
+                                <span class="commentaires-likes"><img src="{{ asset('images/heart.png') }}" alt="Likes"> {{ article.articleLikes|length }}</span>
+                            </div>
+                        </div>
+                    </article>
+                {% else %}
+
+                    <p class="aucun-resultat">
+                        Aucun résultat trouvé.
+                    </p>
+
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Bolonews - Accueil
+{% endblock %}
+
+{% block body %}
+
+    <header class="site-header">
+        <nav class="navbar container">
+
+            <div class="logo">
+                <a href="{{ path('app_home') }}">Home</a>
+            </div>
+
+            <ul class="menu">
+                 <li>
+                    <a
+                        href="{{ path('app_home') }}"
+                        class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}"
+                    >
+                        Home
+                    </a>
+                </li>
+                <li><a href="{{ path('article_liste') }}">Articles</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <div class="connexion">
+                {% if app.user %}
+
+
+                    <span>Bonjour {{ app.user.pseudo }}</span>
+
+
+                    {#<a href="{{ path('app_dashboard') }}" class="profil">Profil
+                        <img
+                            src="{{ asset('images/isabelle.jpg') }}"
+                            alt="Profil"
+                        >
+                    </a>#}
+
+                     {# afficher la route en fonction de user ou admin #}
+                    {% if is_granted('ROLE_ADMIN') %}
+
+                        <a href="{{ path('app_admin') }}" class="profil gr">
+                            Profil
+                            <img
+                                src="{{ asset('images/isabelle.jpg') }}"
+                                alt="Profil"
+                            >
+                        </a>
+
+                    {% else %}
+
+                        <a href="{{ path('app_dashboard') }}" class="profil gr">
+                            Profil
+                            <img
+                                src="{{ asset('images/isabelle.jpg') }}"
+                                alt="Profil"
+                            >
+                        </a>
+
+                    {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+                    <a class="gr" href="{{ path('app_logout') }}">
+                        Se déconnecter
+                    </a>
+                {% else %}
+                    <a class="gr" href="{{ path('app_login') }}">
+                        Se connecter
+                    </a>
+                    <a class="gr" href="{{ path('app_register') }}">
+                        M’inscrire
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+    <main>
+        <!-- section HERO -->
+        <!-- section HERO -->
+        
+        <section class="hero">
+            <h1>Bolonews</h1>
+            <h3>
+                Les meilleures sauces pour les pâtes et de l'actualité sur le grill
+            </h3>
+        </section>
+
+        <!-- section la une -->
+        <!-- section la une -->
+
+        {% if articles is not empty %}
+        {% set articleUne = articles|first %}
+            
+        <section class="a-la-une">
+            <h2>A la une !</h2>
+            <article class="article-une">
+
+                <!-- importer l'image depuis uploads -->
+
+                <div class="image-une">
+                    <img src="{{ asset('uploads/articles/' ~ articleUne.image) }}" alt="{{ articleUne.titre }}">
+                </div>
+
+                <div class="contenu">
+                    <span class="categorie">{{ articleUne.categorie.libelle }}</span>
+                    <h2>
+                        {{ articleUne.titre }}
+                    </h2>
+                    <!-- contenu de l'article -->
+                    {% set extrait = articleUne.contenu|slice(0, 250) %}
+
+                    <p>
+                        {{ extrait|split(' ')|slice(0, -1)|join(' ') }}...
+                    </p>
+                    <div class="infos">
+                        <span class="auteur">
+                            {% if articleUne.auteur %}
+                                {{ articleUne.auteur.pseudo }}
+                            {% else %}
+                                Utilisateur supprimé
+                            {% endif %}
+                        </span>
+                        <span class="auteur">
+                            publié le : {{ articleUne.dateCreation|date('d-m-Y à H:i') }}
+                        </span>
+                    </div>
+                    <!-- btn lire la suite -->
+                    <div class="btn-lire-la-suite">
+                        <a href="{{ path('article_afficher', {id: articleUne.id}) }}">
+                            Lire la suite 
+                            <img
+                                src="{{ asset('images/icons/arrow-right.svg') }}"
+                                alt=""
+                                class="fleche-lire-suite"
+                            >
+                        </a>
+                    </div>
+                    <!-- stats de l'article : commentaires et likes -->
+                    <div class="stats">
+                        <span class="commentaires-likes"><img src="{{ asset('images/message-circle.png') }}" alt="Commentaires"> {{ articleUne.commentaires|length }}</span>
+
+                        <span class="commentaires-likes"><img src="{{ asset('images/heart.png') }}" alt="Likes">{{ articleUne.articleLikes|length }}</span>
+                    </div>
+                    
+                </div>
+            </article>
+        </section>
+
+        <!-- dernieres-parutions -->
+        <!-- dernieres-parutions -->
+        <section class="dernieres-parutions">
+
+            <h2>Dernières parutions</h2>
+            <div class="liste-articles">
+
+                {% for article in articles|slice(1) %}
+                    <article class="card">
+                        <div class="image">
+                            <img
+                                src="{{ asset('uploads/articles/' ~ article.image) }}"
+                                alt="{{ article.titre }}"
+                            >
+                        </div>
+                        
+                        <div class="contenu">
+                            <span class="categorie">
+                                {{ article.categorie.libelle }}
+                            </span>
+                            <h3>
+                                {{ article.titre }}
+                            </h3>
+                            <p class="auteur">
+                                {% if article.auteur %}
+                                    {{ article.auteur.pseudo }}
+                                {% else %}
+                                    Utilisateur supprimé
+                                {% endif %}
+                            </p>
+                            <small class="auteur">
+                                le {{ article.dateCreation|date('d-m-Y à H:i') }}
+                            </small>
+
+                            <!-- contenu de l'article -->
+                            {# afficher les 250 premiers caractères #}
+                            {% set extrait = article.contenu|slice(0, 250) %}
+
+                            {# diviser le contenu en mots, pui enlever le dernier puis recoller le tous avec des espaces #}
+                            <p>
+                                {{ extrait|split(' ')|slice(0, -1)|join(' ') }}...
+                            </p>
+                            <!-- btn lire la suite -->
+                            <div class="btn-lire-la-suite">
+                                <a href="{{ path('article_afficher', {id: article.id}) }}">
+                                    Lire la suite<img
+                                src="{{ asset('images/icons/arrow-right.svg') }}"
+                                alt=""
+                                class="fleche-lire-suite"
+                            >
+                                </a>
+                            </div>
+                           
+                            
+
+                            <!-- stats de l'article : commentaires et likes -->
+                            <div class="stats">
+                                <span class="commentaires-likes"><img src="{{ asset('images/message-circle.png') }}" alt="Commentaires">{{ article.commentaires|length }}</span>
+
+                                <span class="commentaires-likes"><img src="{{ asset('images/heart.png') }}" alt="Likes">{{ articleUne.articleLikes|length }}</span>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+{% else %}
+    <p>Aucun article publié pour le moment.</p>
+{% endif %}
+
+</div>
+
+{% endblock %}

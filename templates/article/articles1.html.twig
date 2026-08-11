@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Bolonews - Accueil
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <header class="site-header">
+        <nav class="navbar">
+
+            <div class="logo">
+                <a href="{{ path('app_home') }}">Articles</a>
+            </div>
+
+            <ul class="menu">
+                <li><a href="{{ path('app_home') }}">Home</a></li>
+                <li><a href="{{ path('article_liste') }}">Articles</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+
+            <div class="connexion">
+
+                {% if app.user %}
+                    <span>Bonjour {{ app.user.pseudo }}</span>
+
+                    <a href="{{ path('app_logout') }}">
+                        Se déconnecter
+                    </a>
+
+                {% else %}
+
+                    <a href="{{ path('app_login') }}">
+                        Se connecter
+                    </a>
+                    <a href="{{ path('app_register') }}">
+                        M’inscrire
+                    </a>
+
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <h1>Articles</h1>
+            <p>
+                Les meilleures sauces pour les pâtes et de l'actualité sur le grill
+            </p>
+        </section>
+
+        <hr>
+        <!-- section la une -->
+            
+        <section class="a-la-une">
+            <h2>A la une !</h2>
+            <article class="article-une">
+                <div class="image">
+                    <img src="{{ asset('images/isabelle.jpg') }}" alt="">
+                </div>
+                <div class="contenu">
+                    <span class="categorie">
+                        Sciences et technologie
+                    </span>
+                    <h2>
+                        Titre de l’article à la une maintenant, il peut être sur
+                        3 lignes maximum mais pas 4
+                    </h2>
+                    <p class="chapeau">
+                        Petit chapeau de l’article qui s’affiche ici sur quelques
+                        lignes mais pas trop non plus.
+                    </p>
+                    <div class="infos">
+                        <span>
+                            Jean Dujardin
+                        </span>
+                        <span>
+                            publié le 01-04-2024 à 14h32
+                      </span>
+                    </div>
+                    <div class="stats">
+                        <span>💬 12</span>
+                        <span>♡ 36</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+        <section class="dernieres-parutions">
+
+            <h2>Dernières parutions</h2>
+
+            <div class="liste-articles">
+
+                {% for i in 1..4 %}
+
+                    <article class="card">
+
+                        <div class="image">
+                            <img src="{{ asset('images/isabelle .jpg') }}" alt="">
+                        </div>
+
+                        <div class="contenu">
+
+                            <span class="categorie">
+                                Sciences et technologie
+                            </span>
+
+                            <h3>
+                                Titre de l’article sur deux lignes pour voir
+                            </h3>
+
+                            <p class="auteur">
+                                Nicolas Ouillon
+                            </p>
+
+                            <small>
+                                le 01-04-2024 à 14h32
+                            </small>
+
+                            <p>
+                                Petit chapeau sur une ligne, deux lignes ou encore
+                                trois lignes maximum.
+                            </p>
+
+                            <a href="#">
+                                Lire la suite →
+                            </a>
+
+                            <div class="stats">
+
+                                <span>💬 12</span>
+
+                                <span>♡ 36</span>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}
